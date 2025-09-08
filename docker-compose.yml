@@ -1,0 +1,60 @@
+services:
+  # backend:
+  #   build:
+  #     context: ./apps/backend
+  #     dockerfile: Dockerfile
+  #   env_file:
+  #     - ./apps/backend/.env
+  #   ports:
+  #     - "8000:8000"
+  #   depends_on:
+  #     - postgres:
+  #         condition: service_healthy
+  #         restart: true
+  #     - redis:
+  #         condition: service_healthy
+  #         restart: true
+  postgres:
+    image: postgres:17-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: tasker
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d tasker"]
+      interval: 10s
+      timeout: 10s
+      start_period: 30s
+      retries: 5
+
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 10s
+      start_period: 30s
+      retries: 5
+
+  localstack:
+    container_name: localstack
+    image: localstack/localstack:s3-latest
+    ports:
+      - "4566:4566"            
+    volumes:
+      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+volumes:
+  postgres_data:
+  redis_data:
