@@ -1,6 +1,6 @@
-module github.com/sriniously/go-boilerplate
+module github.com/rupayan-ninety-eight/tasker
 
-go 1.24.5
+go 1.25.1
 
 require (
 	github.com/clerk/clerk-sdk-go/v2 v2.3.1
